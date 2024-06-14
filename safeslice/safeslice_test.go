@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestSafeSlice_Append(t *testing.T) {
@@ -34,7 +36,9 @@ func TestSafeSlice_Append(t *testing.T) {
 
 			// Check if the values are correct
 			for i, expectedValue := range tt.expectedValues {
-				if s.Get(i) != expectedValue {
+				res := s.Get(i)
+				require.NoError(t, res.Error)
+				if res.Element != expectedValue {
 					t.Errorf("Expected value %v, got %v", expectedValue, s.Get(i))
 				}
 			}
@@ -48,10 +52,11 @@ func TestSafeSlice_GetInt(t *testing.T) {
 		elements      []int
 		index         int
 		expectedValue int
+		expectedError error
 	}{
-		{"ValidIndex", []int{1, 2, 3}, 1, 2},
-		{"InvalidIndex", []int{1, 2, 3}, 3, 0},
-		{"EmptySlice", []int{}, 0, 0},
+		{"ValidIndex", []int{1, 2, 3}, 1, 2, nil},
+		{"InvalidIndex", []int{1, 2, 3}, 3, 0, ErrIndexOutOfRange},
+		{"EmptySlice", []int{}, 0, 0, ErrIndexOutOfRange},
 	}
 
 	for _, tt := range tests {
@@ -62,9 +67,11 @@ func TestSafeSlice_GetInt(t *testing.T) {
 			}
 
 			result := s.Get(tt.index)
+			require.Equal(t, tt.expectedError, result.Error, "error mismatch")
+			element := result.Element
 
-			if !reflect.DeepEqual(result, tt.expectedValue) {
-				t.Errorf("Expected value: %v, got value: %v", tt.expectedValue, result)
+			if !reflect.DeepEqual(element, tt.expectedValue) {
+				t.Errorf("Expected value: %v, got value: %v", tt.expectedValue, element)
 			}
 		})
 	}
@@ -76,10 +83,11 @@ func TestSafeSlice_GetString(t *testing.T) {
 		elements      []string
 		index         int
 		expectedValue string
+		expectedError error
 	}{
-		{"ValidIndex", []string{"test1", "test2", "test3"}, 1, "test2"},
-		{"InvalidIndex", []string{"test1", "test2", "test3"}, 3, ""},
-		{"EmptySlice", []string{}, 0, ""},
+		{"ValidIndex", []string{"test1", "test2", "test3"}, 1, "test2", nil},
+		{"InvalidIndex", []string{"test1", "test2", "test3"}, 3, "", ErrIndexOutOfRange},
+		{"EmptySlice", []string{}, 0, "", ErrIndexOutOfRange},
 	}
 
 	for _, tt := range tests {
@@ -90,9 +98,11 @@ func TestSafeSlice_GetString(t *testing.T) {
 			}
 
 			result := s.Get(tt.index)
+			require.Equal(t, tt.expectedError, result.Error, "error mismatch")
+			element := result.Element
 
-			if !reflect.DeepEqual(result, tt.expectedValue) {
-				t.Errorf("Expected value: %v, got value: %v", tt.expectedValue, result)
+			if !reflect.DeepEqual(element, tt.expectedValue) {
+				t.Errorf("Expected value: %v, got value: %v", tt.expectedValue, element)
 			}
 		})
 	}
@@ -390,8 +400,10 @@ func TestSafeSlice_Swap(t *testing.T) {
 
 			// Check if the values are correct
 			for i, expectedValue := range tt.expectedValues {
-				if s.Get(i) != expectedValue {
-					t.Errorf("Expected value %v, got %v", expectedValue, s.Get(i))
+				result := s.Get(i)
+				require.NoError(t, result.Error)
+				if result.Element != expectedValue {
+					t.Errorf("Expected value %v, got %v", expectedValue, result.Element)
 				}
 			}
 		})
@@ -424,8 +436,10 @@ func TestSafeSlice_SetInt(t *testing.T) {
 
 			// Check if the values are correct
 			for i, expectedValue := range tt.expectedValues {
-				if s.Get(i) != expectedValue {
-					t.Errorf("Expected value %v, got %v", expectedValue, s.Get(i))
+				res := s.Get(i)
+				require.NoError(t, res.Error)
+				if res.Element != expectedValue {
+					t.Errorf("Expected value %v, got %v", expectedValue, res.Element)
 				}
 			}
 		})
@@ -458,8 +472,10 @@ func TestSafeSlice_SetString(t *testing.T) {
 
 			// Check if the values are correct
 			for i, expectedValue := range tt.expectedValues {
-				if s.Get(i) != expectedValue {
-					t.Errorf("Expected value %v, got %v", expectedValue, s.Get(i))
+				res := s.Get(i)
+				require.NoError(t, res.Error)
+				if res.Element != expectedValue {
+					t.Errorf("Expected value %v, got %v", expectedValue, res.Element)
 				}
 			}
 		})
@@ -492,8 +508,10 @@ func TestSafeSlice_SetFloat(t *testing.T) {
 
 			// Check if the values are correct
 			for i, expectedValue := range tt.expectedValues {
-				if s.Get(i) != expectedValue {
-					t.Errorf("Expected value %v, got %v", expectedValue, s.Get(i))
+				res := s.Get(i)
+				require.NoError(t, res.Error)
+				if res.Element != expectedValue {
+					t.Errorf("Expected value %v, got %v", expectedValue, res.Element)
 				}
 			}
 		})
@@ -531,8 +549,10 @@ func TestSafeSlice_SetStruct(t *testing.T) {
 
 			// Check if the values are correct
 			for i, expectedValue := range tt.expectedValues {
-				if s.Get(i) != expectedValue {
-					t.Errorf("Expected value %v, got %v", expectedValue, s.Get(i))
+				res := s.Get(i)
+				require.NoError(t, res.Error)
+				if res.Element != expectedValue {
+					t.Errorf("Expected value %v, got %v", expectedValue, res.Element)
 				}
 			}
 		})
@@ -569,8 +589,10 @@ func TestSafeSlice_Insert(t *testing.T) {
 
 			// Check if the values are correct
 			for i, expectedValue := range tt.expectedValues {
-				if s.Get(i) != expectedValue {
-					t.Errorf("Expected value %v, got %v", expectedValue, s.Get(i))
+				result := s.Get(i)
+				require.NoError(t, result.Error)
+				if result.Element != expectedValue {
+					t.Errorf("Expected value %v, got %v", expectedValue, result.Element)
 				}
 			}
 		})
@@ -607,8 +629,10 @@ func TestSafeSlice_InsertMany(t *testing.T) {
 
 			// Check if the values are correct
 			for i, expectedValue := range tt.expectedValues {
-				if s.Get(i) != expectedValue {
-					t.Errorf("Expected value %v, got %v", expectedValue, s.Get(i))
+				result := s.Get(i)
+				require.NoError(t, result.Error)
+				if result.Element != expectedValue {
+					t.Errorf("Expected value %v, got %v", expectedValue, result.Element)
 				}
 			}
 		})
@@ -640,8 +664,10 @@ func TestSafeSlice_Pop(t *testing.T) {
 
 			// Check if the values are correct
 			for i, expectedValue := range tt.expectedValues {
-				if s.Get(i) != expectedValue {
-					t.Errorf("Expected value %v, got %v", expectedValue, s.Get(i))
+				result := s.Get(i)
+				require.NoError(t, result.Error)
+				if result.Element != expectedValue {
+					t.Errorf("Expected value %v, got %v", expectedValue, result.Element)
 				}
 			}
 		})
@@ -673,8 +699,10 @@ func TestSafeSlice_PopFront(t *testing.T) {
 
 			// Check if the values are correct
 			for i, expectedValue := range tt.expectedValues {
-				if s.Get(i) != expectedValue {
-					t.Errorf("Expected value %v, got %v", expectedValue, s.Get(i))
+				result := s.Get(i)
+				require.NoError(t, result.Error)
+				if result.Element != expectedValue {
+					t.Errorf("Expected value %v, got %v", expectedValue, result.Element)
 				}
 			}
 		})
@@ -707,8 +735,10 @@ func TestSafeSlice_Push(t *testing.T) {
 
 			// Check if the values are correct
 			for i, expectedValue := range tt.expectedValues {
-				if s.Get(i) != expectedValue {
-					t.Errorf("Expected value %v, got %v", expectedValue, s.Get(i))
+				result := s.Get(i)
+				require.NoError(t, result.Error)
+				if result.Element != expectedValue {
+					t.Errorf("Expected value %v, got %v", expectedValue, result.Element)
 				}
 			}
 		})
@@ -741,8 +771,10 @@ func TestSafeSlice_PushFront(t *testing.T) {
 
 			// Check if the values are correct
 			for i, expectedValue := range tt.expectedValues {
-				if s.Get(i) != expectedValue {
-					t.Errorf("Expected value %v, got %v", expectedValue, s.Get(i))
+				result := s.Get(i)
+				require.NoError(t, result.Error)
+				if result.Element != expectedValue {
+					t.Errorf("Expected value %v, got %v", expectedValue, result.Element)
 				}
 			}
 		})
@@ -774,8 +806,10 @@ func TestSafeSlice_Reverse(t *testing.T) {
 
 			// Check if the values are correct
 			for i, expectedValue := range tt.expectedValues {
-				if s.Get(i) != expectedValue {
-					t.Errorf("Expected value %v, got %v", expectedValue, s.Get(i))
+				result := s.Get(i)
+				require.NoError(t, result.Error)
+				if result.Element != expectedValue {
+					t.Errorf("Expected value %v, got %v", expectedValue, result.Element)
 				}
 			}
 		})
@@ -804,12 +838,12 @@ func TestSafeSlice_Map(t *testing.T) {
 			}
 
 			// Map the values
-			result := s.Map(tt.fn)
+			newSlice := s.Map(tt.fn)
 
 			// Check if the values are correct
 			for i, expectedValue := range tt.expectedValues {
-				if result.Get(i) != expectedValue {
-					t.Errorf("Expected value %v, got %v", expectedValue, result.Get(i))
+				if newSlice.Get(i).Element != expectedValue {
+					t.Errorf("Expected value %v, got %v", expectedValue, newSlice.Get(i).Element)
 				}
 			}
 		})
@@ -842,8 +876,10 @@ func TestSafeSlice_ForEach(t *testing.T) {
 
 			// Check if the values are correct
 			for i, expectedValue := range tt.expectedValues {
-				if s.Get(i) != expectedValue {
-					t.Errorf("Expected value %v, got %v", expectedValue, s.Get(i))
+				result := s.Get(i)
+				require.NoError(t, result.Error)
+				if result.Element != expectedValue {
+					t.Errorf("Expected value %v, got %v", expectedValue, result.Element)
 				}
 			}
 		})
@@ -876,8 +912,8 @@ func TestSafeSlice_Filter(t *testing.T) {
 
 			// Check if the values are correct
 			for i, expectedValue := range tt.expectedValues {
-				if result.Get(i) != expectedValue {
-					t.Errorf("Expected value %v, got %v", expectedValue, result.Get(i))
+				if result.Get(i).Element != expectedValue {
+					t.Errorf("Expected value %v, got %v", expectedValue, result.Get(i).Element)
 				}
 			}
 		})
@@ -1090,8 +1126,10 @@ func TestSafeSlice_Remove(t *testing.T) {
 			}
 			s.Remove(tt.fn)
 			for i, expectedValue := range tt.expectedValues {
-				if s.Get(i) != expectedValue {
-					t.Errorf("Expected value %v, got %v", expectedValue, s.Get(i))
+				result := s.Get(i)
+				require.NoError(t, result.Error)
+				if result.Element != expectedValue {
+					t.Errorf("Expected value %v, got %v", expectedValue, result.Element)
 				}
 			}
 		})
@@ -1117,8 +1155,10 @@ func TestSafeSlice_RemoveAt(t *testing.T) {
 			}
 			s.RemoveAt(tt.index)
 			for i, expectedValue := range tt.expectedValues {
-				if s.Get(i) != expectedValue {
-					t.Errorf("Expected value %v, got %v", expectedValue, s.Get(i))
+				result := s.Get(i)
+				require.NoError(t, result.Error)
+				if result.Element != expectedValue {
+					t.Errorf("Expected value %v, got %v", expectedValue, result.Element)
 				}
 			}
 		})
@@ -1155,14 +1195,14 @@ func TestSafeSlice_SplitByFilter(t *testing.T) {
 			satisfied, notSatisfied := s.SplitByFilter(tt.fn)
 
 			for i, el := range satisfied.Values() {
-				if el != tt.expectedSatisfied.Get(i) {
-					t.Errorf("Expected value %v, got %v", tt.expectedSatisfied.Get(i), el)
+				if el != tt.expectedSatisfied.Get(i).Element {
+					t.Errorf("Expected value %v, got %v", tt.expectedSatisfied.Get(i).Element, el)
 				}
 			}
 
 			for i, el := range notSatisfied.Values() {
-				if el != tt.expectedNotSatisfied.Get(i) {
-					t.Errorf("Expected value %v, got %v", tt.expectedNotSatisfied.Get(i), el)
+				if el != tt.expectedNotSatisfied.Get(i).Element {
+					t.Errorf("Expected value %v, got %v", tt.expectedNotSatisfied.Get(i).Element, el)
 				}
 			}
 		})
@@ -1199,14 +1239,14 @@ func TestSafeSlice_SplitAtIndex(t *testing.T) {
 			left, right := s.SplitAtIndex(tt.index)
 
 			for i, el := range left.Values() {
-				if el != tt.expectedLeft.Get(i) {
-					t.Errorf("Expected value %v, got %v", tt.expectedLeft.Get(i), el)
+				if el != tt.expectedLeft.Get(i).Element {
+					t.Errorf("Expected value %v, got %v", tt.expectedLeft.Get(i).Element, el)
 				}
 			}
 
 			for i, el := range right.Values() {
-				if el != tt.expectedRight.Get(i) {
-					t.Errorf("Expected value %v, got %v", tt.expectedRight.Get(i), el)
+				if el != tt.expectedRight.Get(i).Element {
+					t.Errorf("Expected value %v, got %v", tt.expectedRight.Get(i).Element, el)
 				}
 			}
 		})
