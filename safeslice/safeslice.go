@@ -35,14 +35,15 @@ func (s *SafeSlice[T]) Append(x T) {
 
 // Get returns the element at the specified index in the SafeSlice.
 // If the index is out of range, it returns the zero value of the element type.
-func (s *SafeSlice[T]) Get(i int) T {
+func (s *SafeSlice[T]) Get(i int) (T, bool) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+
 	if i < 0 || i >= len(s.slice) {
 		var zero T
-		return zero
+		return zero, false
 	}
-	return s.slice[i]
+	return s.slice[i], true
 }
 
 // Len returns the length of the SafeSlice.

@@ -70,13 +70,16 @@ func NewSafeMapFromKeyValuePairs[K comparable, V any](keysValues []any) (*SafeMa
 }
 
 // Get returns the value associated with the key.
-func (sm *SafeMap[K, V]) Get(k K) interface{} {
+func (sm *SafeMap[K, V]) Get(k K) (V, bool) {
 	sm.RLock()
 	defer sm.RUnlock()
+	var val V
+
 	if val, ok := sm.m[k]; ok {
-		return val
+		return val, true
 	}
-	return nil
+
+	return val, false
 }
 
 // Set sets the value associated with the key.
