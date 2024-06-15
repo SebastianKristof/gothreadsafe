@@ -1,0 +1,3 @@
+# Test target
+test:
+	go test -race -v ./...

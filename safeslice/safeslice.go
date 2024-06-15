@@ -1,8 +1,13 @@
 package safeslice
 
 import (
+	"errors"
 	"sort"
 	"sync"
+)
+
+var (
+	ErrIndexOutOfRange = errors.New("index out of range")
 )
 
 // SafeSlice is a thread-safe implementation of a slice.
@@ -33,16 +38,24 @@ func (s *SafeSlice[T]) Append(x T) {
 	s.slice = append(s.slice, x)
 }
 
+// ElementResult is the result of a Get operation on a SafeSlice.
+type ElementResult[T any] struct {
+	Element T
+	Error   error
+}
+
 // Get returns the element at the specified index in the SafeSlice.
 // If the index is out of range, it returns the zero value of the element type.
-func (s *SafeSlice[T]) Get(i int) T {
+func (s *SafeSlice[T]) Get(i int) ElementResult[T] {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+
 	if i < 0 || i >= len(s.slice) {
 		var zero T
-		return zero
+		return ElementResult[T]{Element: zero, Error: ErrIndexOutOfRange}
 	}
-	return s.slice[i]
+
+	return ElementResult[T]{Element: s.slice[i], Error: nil}
 }
 
 // Len returns the length of the SafeSlice.

@@ -12,6 +12,12 @@ type SafeMap[K comparable, V any] struct {
 	m map[K]V
 }
 
+// ValueResult is the result of a Get operation on a SafeMap.
+type ValueResult[V any] struct {
+	Value V
+	Found bool
+}
+
 // NewSafeMap creates a new SafeMap.
 func NewSafeMap[K comparable, V any]() *SafeMap[K, V] {
 	sm := new(SafeMap[K, V])
@@ -23,7 +29,7 @@ func NewSafeMap[K comparable, V any]() *SafeMap[K, V] {
 func NewSafeMapFromMap[K comparable, V any](m map[K]V) *SafeMap[K, V] {
 	sm := new(SafeMap[K, V])
 	sm.m = make(map[K]V)
-	for k, v := range sm.m {
+	for k, v := range m {
 		sm.m[k] = v
 	}
 	return sm
@@ -70,13 +76,16 @@ func NewSafeMapFromKeyValuePairs[K comparable, V any](keysValues []any) (*SafeMa
 }
 
 // Get returns the value associated with the key.
-func (sm *SafeMap[K, V]) Get(k K) interface{} {
+func (sm *SafeMap[K, V]) Get(k K) ValueResult[V] {
 	sm.RLock()
 	defer sm.RUnlock()
+	var val V
+
 	if val, ok := sm.m[k]; ok {
-		return val
+		return ValueResult[V]{Value: val, Found: true}
 	}
-	return nil
+
+	return ValueResult[V]{Value: val, Found: false}
 }
 
 // Set sets the value associated with the key.
@@ -206,4 +215,11 @@ func (sm *SafeMap[K, V]) Export() map[K]V {
 		m[k] = v
 	}
 	return m
+}
+
+// String returns a string representation of the SafeMap.
+func (sm *SafeMap[K, V]) String() string {
+	sm.RLock()
+	defer sm.RUnlock()
+	return fmt.Sprintf("%v", sm.m)
 }
