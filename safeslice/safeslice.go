@@ -52,8 +52,9 @@ func (s *SafeSlice[T]) Get(i int) ElementResult[T] {
 
 	if i < 0 || i >= len(s.slice) {
 		var zero T
-		return ElementResult[T]{Element: zero, Error: errors.New("index out of range")}
+		return ElementResult[T]{Element: zero, Error: ErrIndexOutOfRange}
 	}
+
 	return ElementResult[T]{Element: s.slice[i], Error: nil}
 }
 
