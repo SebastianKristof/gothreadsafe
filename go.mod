@@ -1,4 +1,4 @@
-module racesafe
+module gothreadsafe
 
 go 1.22.3
 

@@ -29,7 +29,7 @@ func NewSafeMap[K comparable, V any]() *SafeMap[K, V] {
 func NewSafeMapFromMap[K comparable, V any](m map[K]V) *SafeMap[K, V] {
 	sm := new(SafeMap[K, V])
 	sm.m = make(map[K]V)
-	for k, v := range sm.m {
+	for k, v := range m {
 		sm.m[k] = v
 	}
 	return sm
@@ -215,4 +215,11 @@ func (sm *SafeMap[K, V]) Export() map[K]V {
 		m[k] = v
 	}
 	return m
+}
+
+// String returns a string representation of the SafeMap.
+func (sm *SafeMap[K, V]) String() string {
+	sm.RLock()
+	defer sm.RUnlock()
+	return fmt.Sprintf("%v", sm.m)
 }
