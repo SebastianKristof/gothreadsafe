@@ -1,6 +1,6 @@
 # gothreadsafe: Thread-Safe Data Structures in Go
 
-**racesafe** is a Go package designed to provide thread-safe versions of Go's built-in data structures such as slices, maps, and other types. This package ensures that operations on these data structures are safe against race conditions, making it ideal for concurrent applications.
+**gothreadsafe** is a Go package designed to provide thread-safe versions of Go's built-in data structures such as slices, maps, and other types. This package ensures that operations on these data structures are safe against race conditions, making it ideal for concurrent applications.
 
 ## Features
 
