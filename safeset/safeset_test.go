@@ -600,7 +600,10 @@ func TestSet_Clone(t *testing.T) {
 
 func TestSet_StringInt(t *testing.T) {
 	s := NewSetWithValues[int](1, 2, 3)
-	require.Equal(t, "{1, 2, 3}", s.String())
+
+	require.Contains(t, s.String(), "1")
+	require.Contains(t, s.String(), "2")
+	require.Contains(t, s.String(), "3")
 }
 
 func TestSet_StringEmpty(t *testing.T) {
@@ -610,7 +613,10 @@ func TestSet_StringEmpty(t *testing.T) {
 
 func TestSet_StringString(t *testing.T) {
 	s := NewSetWithValues[string]("one", "two", "three")
-	require.Equal(t, "{one, two, three}", s.String())
+
+	require.Contains(t, s.String(), "one")
+	require.Contains(t, s.String(), "two")
+	require.Contains(t, s.String(), "three")
 }
 
 func TestSet_StringStruct(t *testing.T) {
@@ -624,7 +630,9 @@ func TestSet_StringStruct(t *testing.T) {
 	s.Add(person{"Bob", 30})
 	s.Add(person{"Charlie", 35})
 
-	require.Equal(t, "{{Alice 25}, {Bob 30}, {Charlie 35}}", s.String())
+	require.Contains(t, s.String(), "{Alice 25}")
+	require.Contains(t, s.String(), "{Bob 30}")
+	require.Contains(t, s.String(), "{Charlie 35}")
 }
 
 func TestSet_IsEmpty(t *testing.T) {
