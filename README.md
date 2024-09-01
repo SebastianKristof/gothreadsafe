@@ -6,6 +6,7 @@
 
 - **Thread-Safe Slices:** Perform append, remove, and many other operations on slices without worrying about race conditions.
 - **Thread-Safe Maps:** Use maps with concurrent read/write operations safely.
+- **Thread-Safe Sets:** Perform various operations with sets.
 - **Additional Thread-Safe Types:** Includes thread-safe implementations of other commonly used types.
 - **Easy to Use:** Designed to be a drop-in replacement for non-thread-safe versions with minimal changes to your code.
 
@@ -63,6 +64,33 @@ if ok {
 
 // Remove an element from the slice
 s.Remove(0)
+```
+
+### Sets:
+
+```go
+// Create a new thread-safe set
+s1 := gothreadsafe.NewSet()
+s2 := gothreadsafe.NewSet()
+
+// Append an element to the set
+s1.Add("element1")
+s2.Add("element2")
+
+// Check if set contains element 1
+isInSet := s1.Contains("element1")
+fmt.Printf("Set contains the element: %t", isInSet)
+
+// Perform a union operation
+setUnion := s1.Union(s2)
+
+// Check that union set contains element 2
+isInSet := setUnion.Contains("element2")
+fmt.Printf("Set contains the element: %t", isInSet)
+
+// Clear the base sets
+s1.Clear()
+s2.Clear()
 ```
 
 ### Contributing
