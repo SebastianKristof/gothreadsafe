@@ -1,4 +1,4 @@
-module gothreadsafe
+module github.com/SebastianKristof/gothreadsafe
 
 go 1.22.3
 
